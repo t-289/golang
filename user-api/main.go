@@ -50,6 +50,7 @@ func deleteUser(c *gin.Context) {
 		if usr.User == user {
 			fmt.Println(x, usr)
 			users = append(users[:x], users[x:]...)
+			c.IndentedJSON(http.StatusAccepted, (usr.Name + " was deleted"))
 			return
 		}
 	}

@@ -18,7 +18,7 @@ type User struct {
 func getUser(c *gin.Context) {
 	//Receive the user from parameter "user"
 	user := c.Param("user")
-	queryString := fmt.Sprintf("SELECT * FROM users WHERE user = '%s'", user)
+	queryString := fmt.Sprintf("SELECT * FROM users WHERE token = '%s'", user)
 	selDB, err := dbconn.DBSelect(queryString)
 
 	if err != nil {
@@ -44,13 +44,34 @@ func getUser(c *gin.Context) {
 		userDt = append(userDt, userSt)
 	}
 
-	c.IndentedJSON(http.StatusOK, userDt)
+	if len(userDt) != 0 {
+		c.IndentedJSON(http.StatusOK, userDt)
+		return
+	}
+
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not Found"})
+}
+
+func delUser(c *gin.Context) {
+	user := c.Param("user")
+	queryString := fmt.Sprintf("DELETE FROM users WHERE token = '%s'", user)
+	result, err := dbconn.DBDelete(queryString)
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if result > 0 {
+		c.IndentedJSON(http.StatusOK, gin.H{"Status": "Deleted"})
+		return
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not Found"})
+
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/users/:user", getUser)
-
+	router.GET("/delete/:user", delUser)
 	router.Run("localhost:8080")
 }

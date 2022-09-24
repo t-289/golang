@@ -1,10 +1,12 @@
 package dbconn
 
-import {
+import (
 	"database/sql"
-}
 
-func dbConn() (db *sql.DB) {
+	_ "github.com/go-sql-driver/mysql"
+)
+
+func dbConn() (*sql.DB, error) {
 	dbDriver := "mysql"
 	dbUser := "dev"
 	dbPass := "123456"
@@ -16,12 +18,15 @@ func dbConn() (db *sql.DB) {
 		panic(err.Error())
 	}
 
-	return db
+	return db, nil
 }
 
+func DBSelect(queryString string) (*sql.Rows, error) {
+	db, err := dbConn()
 
-func dbSelect(queryString string) {
-	db := dbConn()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	selectDB, err := db.Query(queryString)
 
@@ -29,5 +34,5 @@ func dbSelect(queryString string) {
 		panic(err.Error())
 	}
 
-	return selectDB
+	return selectDB, err
 }

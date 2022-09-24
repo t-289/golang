@@ -1,16 +1,14 @@
 package main
 
 import (
-	"database/sql"
-	"errors"
 	"fmt"
 	"net/http"
- 
+
 	"github.com/gin-gonic/gin"
-	"user-api/dbconn"
+	"github.com/t-289/golang/user-api/dbconn"
 )
 
-type user struct {
+type User struct {
 	ID    string `json:"id"`
 	User  string `json:"user"`
 	Name  string `json:"name"`
@@ -21,19 +19,19 @@ func getUser(c *gin.Context) {
 	//Receive the user from parameter "user"
 	user := c.Param("user")
 	queryString := fmt.Sprintf("SELECT * FROM users WHERE user = '%s'", user)
-	selDB := dbcon.selectDB(queryString)
+	selDB, err := dbconn.DBSelect(queryString)
 
-	userSt := user{}
-	userDt := []user{}
+	userSt := User{}
+	userDt := []User{}
 
 	for selDB.Next() {
-		var id, user, name, token string
+		var id, users, name, token string
 
-		err = selDB.Scan(%id, %user, %name, %token)
+		err = selDB.Scan(&id, &users, &name, &token)
 		if err != nil {
 			panic(err.Error())
 		}
-		
+
 		userSt.ID = id
 		userSt.User = user
 		userSt.Name = name
@@ -42,14 +40,13 @@ func getUser(c *gin.Context) {
 		userDt = append(userDt, userSt)
 	}
 
-	c.IndentedJSON(http.StatusOK, useruserDt)
+	c.IndentedJSON(http.StatusOK, userDt)
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not Found"})
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/users/:user", getUser)
-	router.POST("/add/", addUser)
-	router.GET("/delete/:user", deleteUser)
+
 	router.Run("localhost:8080")
 }

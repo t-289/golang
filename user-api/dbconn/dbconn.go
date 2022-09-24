@@ -34,5 +34,7 @@ func DBSelect(queryString string) (*sql.Rows, error) {
 		panic(err.Error())
 	}
 
+	defer db.Close()
+
 	return selectDB, err
 }

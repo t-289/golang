@@ -21,6 +21,10 @@ func getUser(c *gin.Context) {
 	queryString := fmt.Sprintf("SELECT * FROM users WHERE user = '%s'", user)
 	selDB, err := dbconn.DBSelect(queryString)
 
+	if err != nil {
+		panic(err.Error())
+	}
+
 	userSt := User{}
 	userDt := []User{}
 

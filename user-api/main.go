@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/t-289/Golang/user-api/dbcon"
 )
 
 type user struct {
@@ -14,46 +17,32 @@ type user struct {
 	Token string `json:"token"`
 }
 
-var users = []user{
-	{ID: "666", User: "Eddie", Name: "Eddie Munson", Token: "RWRkaWUtNjY2"},
-	{ID: "117", User: "John", Name: "John Spartan", Token: "Sm9obi0xMTc="},
-	{ID: "101", User: "Sarah", Name: "Sarah Connor", Token: "U2FyYWgtMTAx"},
-}
-
 func getUser(c *gin.Context) {
+	//Receive the user from parameter "user"
 	user := c.Param("user")
-	for x, usr := range users {
-		if usr.User == user {
-			fmt.Println(x, usr)
-			c.IndentedJSON(http.StatusOK, usr)
-			return
+	queryString := fmt.Sprintf("SELECT * FROM users WHERE user = '%s'", user)
+	selDB := dbcon.selectDB(queryString)
+
+	userSt := user{}
+	userDt := []user{}
+
+	for selDB.Next() {
+		var id, user, name, token string
+
+		err = selDB.Scan(%id, %user, %name, %token)
+		if err != nil {
+			panic(err.Error())
 		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not Found"})
-}
+		
+		userSt.ID = id
+		userSt.User = user
+		userSt.Name = name
+		userSt.Token = token
 
-func addUser(c *gin.Context) {
-	var newUser user
-
-	if err := c.BindJSON(&newUser); err != nil {
-		return
+		userDt = append(userDt, userSt)
 	}
 
-	users = append(users, newUser)
-	c.IndentedJSON(http.StatusCreated, newUser)
-}
-
-func deleteUser(c *gin.Context) {
-
-	user := c.Param("user")
-	for x, usr := range users {
-		if usr.User == user {
-			fmt.Println(x, usr)
-			users = append(users[:x], users[x:]...)
-			c.IndentedJSON(http.StatusAccepted, (usr.Name + " was deleted"))
-			return
-		}
-	}
+	c.IndentedJSON(http.StatusOK, useruserDt)
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Not Found"})
 }
 

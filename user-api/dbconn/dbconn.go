@@ -6,11 +6,12 @@ import {
 
 func dbConn() (db *sql.DB) {
 	dbDriver := "mysql"
-	dbUser := ""
-	dbPass := ""
-	dbName := ""
+	dbUser := "dev"
+	dbPass := "123456"
+	dbName := "dev"
+	dbServer := "172.17.0.3"
 
-	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
+	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@"+dbServer+"/"+dbName)
 	if err != nil {
 		panic(err.Error())
 	}

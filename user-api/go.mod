@@ -1,4 +1,4 @@
-module github.com/t-289/Golang/user-api
+module github.com/t-289/golang/user-api
 
 go 1.18
 

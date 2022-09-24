@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-
+ 
 	"github.com/gin-gonic/gin"
-	"github.com/t-289/Golang/user-api/dbconn"
+	"user-api/dbconn"
 )
 
 type user struct {
